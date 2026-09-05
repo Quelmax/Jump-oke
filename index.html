@@ -105,7 +105,7 @@
           setLoading(false);
         } else {
           // SEU LINK DO STORAGE AQUI
-          fetch('SUA_URL_DO_STORAGE')
+          fetch('https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0482031825.firebasestorage.app/o/catalogo.json?alt=media')
             .then(res => res.json())
             .then(data => {
               localStorage.setItem('catalogoJumpOke', JSON.stringify(data));
