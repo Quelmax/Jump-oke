@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Fila JUMP-OKÊ</title>
+  
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@400;600;700&display=swap');
+    body { background-color: #F3EBD4; font-family: 'Inter', sans-serif; }
+    .font-brand { font-family: 'Pacifico', cursive; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    const AdminApp = () => {
+      const [queue, setQueue] = useState([]);
+      const [db, setDb] = useState(null);
+
+      useEffect(() => {
+        // COLE SUAS CHAVES DO FIREBASE AQUI
+        const firebaseConfig = {
+          apiKey: "AIzaSyCHwO56jd9RsozoGBycp2m9DRTuI4ZxBgw",
+          authDomain: "gen-lang-client-0482031825.firebaseapp.com",
+          projectId: "gen-lang-client-0482031825",
+          storageBucket: "gen-lang-client-0482031825.firebasestorage.app",
+          messagingSenderId: "538452063756",
+          appId: "1:538452063756:web:b58b8a0c085edd758ba029",
+          measurementId: "G-W2Q5BW8NBP"
+        };
+
+        if (!firebase.apps.length) {
+          firebase.initializeApp(firebaseConfig);
+        }
+        const firestoreDb = firebase.firestore();
+        setDb(firestoreDb);
+
+        const unsubscribe = firestoreDb.collection('fila').orderBy('timestamp', 'asc')
+          .onSnapshot(snapshot => {
+            const filaAtualizada = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            setQueue(filaAtualizada);
+          });
+
+        return () => unsubscribe();
+      }, []);
+
+      const handleDelete = (id) => {
+        if (window.confirm("Deseja remover esta música da fila?")) {
+          db.collection('fila').doc(id).delete();
+        }
+      };
+
+      return (
+        <div className="max-w-md mx-auto min-h-screen p-4">
+          <header className="mb-8 mt-4">
+            <h1 className="font-brand text-4xl text-center text-gray-800">Admin <span style={{ color: '#FF6B6B' }}>Fila</span></h1>
+          </header>
+          
+          <main>
+            {queue.length === 0 ? (
+              <p className="text-center text-gray-500">Ninguém na fila ainda.</p>
+            ) : (
+              <div className="flex flex-col gap-3">
+                {queue.map((item, index) => (
+                  <div key={item.id} className="bg-white p-4 rounded-xl shadow-sm border border-red-100 flex items-center justify-between">
+                    <div>
+                      <p className="font-bold text-gray-800">{index + 1}. {item.cantor}</p>
+                      <p className="text-sm text-gray-500">{item.musica}</p>
+                    </div>
+                    <button onClick={() => handleDelete(item.id)} className="bg-red-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-600">
+                      Remover
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </main>
+        </div>
+      );
+    };
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<AdminApp />);
+  </script>
+</body>
+</html>

@@ -5,14 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>JUMP-OKÊ - Catálogo e Fila</title>
   
-  <!-- React e Tailwind -->
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
 
-  <!-- Firebase V8 -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
@@ -77,13 +75,6 @@
       const [visibleCount, setVisibleCount] = useState(50);
       const [db, setDb] = useState(null);
 
-      // Dados de exemplo
-      const mockData = [
-        { id: 1, titulo: "A Cruz Vazia", artista: "Kleber Lucas", genero: "Gospel", tom_original: "F#", tags: ["Adoração", "4/4", "Anos 2000"], caminho_arquivo: "", caminho_drive: "#" },
-        { id: 2, titulo: "Deus de Promessas", artista: "Davi Sacer", genero: "Gospel", tom_original: "G", tags: ["Louvor"], caminho_arquivo: "", caminho_drive: "#" },
-        { id: 3, titulo: "1000 Graus", artista: "Renascer Praise", genero: "Gospel", tom_original: "Em", tags: ["Agitada"], caminho_arquivo: "", caminho_drive: "#" }
-      ];
-
       useEffect(() => {
         // COLE SUAS CHAVES DO FIREBASE AQUI
         const firebaseConfig = {
@@ -108,27 +99,21 @@
             setQueue(filaAtualizada);
           });
 
-        // Simulação de carregamento (Remova e use o fetch abaixo no GitHub)
-        //setTimeout(() => { setSongs(mockData); setLoading(false); }, 800);
-
-      const cachedData = localStorage.getItem('catalogoJumpOke');
-
+        const cachedData = localStorage.getItem('catalogoJumpOke');
         if (cachedData) {
-          // Carrega da memória do celular (Não gasta banda)
           setSongs(JSON.parse(cachedData));
           setLoading(false);
         } else {
-          // Baixa do Firebase apenas na primeira vez
-          fetch('https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0482031825.firebasestorage.app/o/catalogo.json?alt=media')
+          // SEU LINK DO STORAGE AQUI
+          fetch('SUA_URL_DO_STORAGE')
             .then(res => res.json())
             .then(data => {
               localStorage.setItem('catalogoJumpOke', JSON.stringify(data));
               setSongs(data);
               setLoading(false);
             })
-            .catch(err => console.error("Erro ao carregar catálogo", err));
+            .catch(err => console.error("Erro", err));
         }
-                      
 
         return () => unsubscribe();
       }, []);
@@ -146,6 +131,7 @@
             cantor: cantor,
             musica: song.titulo,
             artista: song.artista,
+            caminho_drive: song.caminho_drive,
             timestamp: firebase.firestore.FieldValue.serverTimestamp()
           }).then(() => {
             alert("Música adicionada à fila!");
@@ -181,18 +167,32 @@
       return (
         <div className="max-w-md mx-auto min-h-screen pb-20">
           <header className="sticky top-0 z-50 pt-6 pb-4 px-4 shadow-sm" style={{ backgroundColor: '#F3EBD4' }}>
-            <h1 className="font-brand text-5xl text-center mb-6">Jump</h1>
+            <div className="text-center w-full mx-auto mb-6">
+              <h1 
+                className="font-brand text-7xl md:text4xl text-brand tracking-wider mb-1 cursor-pointer transition-transform hover:scale-105" 
+                style={{ textShadow: '2px 2px 0px rgba(0,0,0,0.05)' }}
+                onClick={() => { handleTabChange('search'); setSearchTerm(''); }}
+                title="Voltar ao início"
+              >
+                Jump
+                <span className="text-4xl md:text-5xl ml-2 font-extrabold tracking-tight" style={{ color: '#FF6B6B', fontFamily: 'Inter, sans-serif' }}>
+                  okê
+                </span>
+              </h1>
+              <p className="text-sm md:text-base text-gray-600 font-medium opacity-80 mt-2">
+                Encontre sua música e solte a voz!
+              </p>
+            </div>
+            
             <div className="flex overflow-x-auto hide-scrollbar bg-white/60 rounded-xl p-1 shadow-sm border border-white/50 gap-1">
-              <button onClick={() => handleTabChange('search')} className={`flex-shrink-0 px-4 py-2 text-sm font-bold rounded-lg ${activeTab === 'search' ? 'bg-white text-brand shadow-sm' : 'text-gray-500'}`}>🔎 Buscar</button>
-              <button onClick={() => handleTabChange('artists')} className={`flex-shrink-0 px-4 py-2 text-sm font-bold rounded-lg ${activeTab === 'artists' ? 'bg-white text-brand shadow-sm' : 'text-gray-500'}`}>🎤 Artistas</button>
-              <button onClick={() => handleTabChange('az')} className={`flex-shrink-0 px-4 py-2 text-sm font-bold rounded-lg ${activeTab === 'az' ? 'bg-white text-brand shadow-sm' : 'text-gray-500'}`}>🎵 A-Z</button>
-              <button onClick={() => handleTabChange('queue')} className={`flex-shrink-0 px-4 py-2 text-sm font-bold rounded-lg ${activeTab === 'queue' ? 'bg-white text-brand shadow-sm' : 'text-gray-500'}`}>📺 Fila</button>
+              <button onClick={() => handleTabChange('search')} className={`flex-shrink-0 px-4 py-2 text-sm font-bold rounded-lg transition-colors ${activeTab === 'search' ? 'bg-white text-brand shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>🔎 Buscar</button>
+              <button onClick={() => handleTabChange('artists')} className={`flex-shrink-0 px-4 py-2 text-sm font-bold rounded-lg transition-colors ${activeTab === 'artists' ? 'bg-white text-brand shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>🎤 Artistas</button>
+              <button onClick={() => handleTabChange('az')} className={`flex-shrink-0 px-4 py-2 text-sm font-bold rounded-lg transition-colors ${activeTab === 'az' ? 'bg-white text-brand shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>🎵 A-Z</button>
+              <button onClick={() => handleTabChange('queue')} className={`flex-shrink-0 px-4 py-2 text-sm font-bold rounded-lg transition-colors ${activeTab === 'queue' ? 'bg-white text-brand shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>📺 Fila</button>
             </div>
           </header>
 
           <main className="p-4">
-            
-            {/* ABA: BUSCA */}
             {activeTab === 'search' && (
               <div className="animate-fade-in">
                 <input type="text" placeholder="Música, artista ou tag..." className="w-full bg-white rounded-xl py-4 px-4 mb-6 shadow-sm focus:ring-2 outline-none font-medium text-gray-700" value={searchTerm} onChange={(e) => {setSearchTerm(e.target.value); resetView();}} />
@@ -207,7 +207,6 @@
               </div>
             )}
 
-            {/* ABA: ARTISTAS */}
             {activeTab === 'artists' && (
               <div className="animate-fade-in">
                 {!selectedArtist ? (
@@ -229,7 +228,6 @@
               </div>
             )}
 
-            {/* ABA: A-Z */}
             {activeTab === 'az' && (
               <div className="animate-fade-in">
                 <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-2 mb-4">
@@ -242,7 +240,6 @@
               </div>
             )}
 
-            {/* ABA: FILA */}
             {activeTab === 'queue' && (
               <div className="animate-fade-in">
                 <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
@@ -255,9 +252,14 @@
                     {queue.map((item, index) => (
                       <div key={item.id} className="bg-white p-4 rounded-xl shadow-sm border-l-4 border-[#3AADD9] flex items-center gap-4">
                         <div className="bg-gray-100 text-gray-500 font-bold w-8 h-8 rounded-full flex items-center justify-center shrink-0">{index + 1}</div>
-                        <div>
+                        <div className="flex-1">
                           <p className="font-bold text-gray-800 text-lg leading-tight">{item.cantor}</p>
                           <p className="text-sm text-gray-500">cantando <strong>{item.musica}</strong></p>
+                          {item.caminho_drive && item.caminho_drive !== "#" && (
+                            <a href={item.caminho_drive} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs text-brand mt-2 font-bold hover:underline bg-blue-50 px-2 py-1 rounded">
+                              <i data-lucide="external-link" className="w-3 h-3"></i> Abrir Cifra
+                            </a>
+                          )}
                         </div>
                       </div>
                     ))}
