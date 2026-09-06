@@ -125,6 +125,11 @@
       const alphabet = ['Todos', '#', ...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')];
 
       const handleAddToQueue = (song) => {
+       alert("As inscrições foram encerradas por hoje! Curta as últimas músicas na aba Fila.");
+       return; // O return força a função a parar aqui, ignorando o resto do código
+
+  // ... o resto do seu código original do prompt continua abaixo
+
         const cantor = prompt(`Quem vai cantar "${song.titulo}"?`);
         if (cantor && cantor.trim() !== "" && db) {
           db.collection('fila').add({
